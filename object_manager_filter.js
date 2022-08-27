@@ -20,7 +20,7 @@ structure_of_code:
     8. 211 - 238 same p.7 for other menus
     9. 242 - 246 filter function
     10. 248 - 284 bool function for filter function
-    11. 289 - ajax technology that reload only some parts in html code not all site 
+    11. 289 - ajax technology that reload only some parts in html code not all site
 
 
 
@@ -162,7 +162,7 @@ function init()
 
         //0menu
         // Создадим n  пунктов выпадающего списка.
-            var listBoxItems = ['в 1 класс','во 2 класс','в 3 класс','в 4 класс','в 5 класс','в 6 класс','в 7 класс','в 8 класс','в 9 класс','в 10 класс','в 11 класс']//!!!
+            var listBoxItems = ['в 1 класс','в 2 класс','в 3 класс','в 4 класс','в 5 класс','в 6 класс','в 7 класс','в 8 класс','в 9 класс','в 10 класс','в 11 класс']//!!!
                 .map(//выполнить следующую функцию над каждым объектом
                 function (_) {return new ymaps.control.ListBoxItem({data: {content: _}, state: {selected: true}} )})
 
@@ -248,7 +248,7 @@ function init()
         function getFilterFunction(categories) {
             return function (obj){
                 //console.log(categories)
-                var nabor = categories[obj.properties['в 1 класс']] || categories[obj.properties['во 2 класс']] ||
+                var nabor = categories[obj.properties['в 1 класс']] || categories[obj.properties['в 2 класс']] ||
                         categories[obj.properties['в 3 класс']] || categories[obj.properties['в 4 класс']] ||
                         categories[obj.properties['в 5 класс']] || categories[obj.properties['в 6 класс']] ||
                         categories[obj.properties['в 7 класс']] || categories[obj.properties['в 8 класс']] ||
@@ -279,7 +279,8 @@ function init()
 
                 var answer =  nabor && profil && okrug && month && tip
 
-                console.log(nabor, profil, okrug, month, tip)
+                // console.log(nabor, profil, okrug, month, tip)
+                // console.log(categories)
                 return answer
                 }
             }
