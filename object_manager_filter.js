@@ -17,10 +17,12 @@ structure_of_code:
     5. 87 - 181 same that in p.4
     6. 188-197 load to listbox.filters primary filters by which he should compare
     7. 205 - 210 tracking changes in the menu
-    8. 211 - 238 same p.7 for other menus
-    9. 242 - 246 filter function
-    10. 248 - 284 bool function for filter function
-    11. 289 - ajax technology that reload only some parts in html code not all site
+    8. 211 - 235 same p.7 for other menus
+    9. 235 - 240 filter function
+    10. 241-246 function for button
+    11. 250 - 300 bool function for filter function
+    12. 302 - ajax technology that reload only some parts in html code not all site
+    13. comments for search on map
 
 
 
@@ -37,8 +39,7 @@ function init()
     {
         //создание карты не трогаем
         var myMap = new ymaps.Map('map',
-                {center: [55.76, 37.64], zoom: 10 , controls: []},
-                {searchControlProvider: 'yandex#search'})
+                {center: [55.76, 37.64], zoom: 10 , controls: []})
         var objectManager = new ymaps.ObjectManager
             ({
                 clusterize: true,// Чтобы метки начали кластеризоваться, выставляем опцию.
@@ -181,10 +182,6 @@ function init()
         //////// отвечает за то чтобы добавился новая менюшка на карту
 
 
-
-
-
-
             //Задаем первоначальные фигни
             var filters = ymaps.util.extend(
                 {'check_documentation': false},
@@ -195,7 +192,6 @@ function init()
                 listBoxControl4.state.get('filters'),
             );
             listBoxControl.state.set('filters', filters);
-
 
 
 
@@ -233,21 +229,28 @@ function init()
 
                 var listBoxItem = e.get('target');
                 var filters = ymaps.util.extend({}, listBoxControl.state.get('filters'));
-                filters[listBoxItem.data.get('content')] = listBoxItem.isSelected();
+                filters[listBoxItem.data.get('content')] = listBoxItem.isSelected();//смотрит какие выбраны
                 listBoxControl.state.set('filters', filters);
         });
-
 
 
         var filterMonitor = new ymaps.Monitor(listBoxControl.state);
         filterMonitor.add('filters', function (filters) {
             objectManager.setFilter(getFilterFunction(filters));
         });
+
+        //добавили эту фигню, при нажатии на кнопку отрабатывает функция фильтрации, в которую добавили поле ввода
+        $('#addMarkers').bind('click', for_button);
+        function for_button() {
+            objectManager.setFilter(getFilterFunction(ymaps.util.extend({}, listBoxControl.state.get('filters'))));
+        };
+
+
             // Применим фильтр.
 
         function getFilterFunction(categories) {
             return function (obj){
-                //console.log(categories)
+            //console.log(categories)
                 var nabor = categories[obj.properties['в 1 класс']] || categories[obj.properties['в 2 класс']] ||
                         categories[obj.properties['в 3 класс']] || categories[obj.properties['в 4 класс']] ||
                         categories[obj.properties['в 5 класс']] || categories[obj.properties['в 6 класс']] ||
@@ -277,14 +280,24 @@ function init()
                 var tip = categories[obj.properties['Лицей']] || categories[obj.properties['Гимназия']] ||
                     categories[obj.properties['Школа']] || categories[obj.properties['Частная школа']]
 
-                var answer =  nabor && profil && okrug && month && tip
+                //считываем инфу с ячейки, переводим в строку-> в маленький регистр->удаляем пробелы в начале и конце
+                var from_box = String($('#count').val()).toLowerCase().trim()
+                //считываем инфу с названия школа, переводим в строку-> в маленький регистр->удаляем пробелы в начале и конце
+                var object = obj.properties['iconContent'].toLowerCase().trim()
 
-                // console.log(nabor, profil, okrug, month, tip)
-                // console.log(categories)
+                // если ячейка пустая, то фильтр не применяем, иначе фильтруем по имени
+                if (from_box == "") {
+                    var search = true;
+                } else {
+                    var search = object.includes(from_box);//здесь проверка на наличие тут имени
+                }
+                // console.log(search)
+
+                var answer =  nabor && profil && okrug && month && tip && search
+                // console.log(answer)
                 return answer
                 }
             }
-
 
 
         $.ajax({
@@ -292,5 +305,19 @@ function init()
         }).done(function (data) {
             objectManager.add(data);
         });
+        		// хотел сначала через поиск, но подумал в пизду))
+        // Создаем экземпляр класса ymaps.control.SearchControl
+		// var mySearchControl = new ymaps.control.SearchControl({
+		// 	options: {
+		// 		// Заменяем стандартный провайдер данных (геокодер) нашим собственным.
+        //
+		// 		// Не будем показывать еще одну метку при выборе результата поиска,
+		// 		// т.к. метки коллекции myCollection уже добавлены на карту.
+		// 		noPlacemark: true,
+		// 		resultsPerPage: 5
+		// 	}});
+        //
+		// // Добавляем контрол в верхний правый угол,
+		// myMap.controls
+		// 	.add(mySearchControl, { float: 'right' });
     }
-
