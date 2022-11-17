@@ -7,7 +7,7 @@ but this code can`t work easy for this.
 map can take filters from Listboxes(6 menu on the top) and give dictionary(categories)
 and check with a dictionary(check_documentation: false, Июль: true, Март: false, ...)
 in  getFilterFunction() this check from filters and if it return True it will be shown on map
-
+made by nek1kek
 
 structure_of_code:
     1. call  main function of api that initializate map
@@ -239,7 +239,7 @@ function init()
             objectManager.setFilter(getFilterFunction(filters));
         });
 
-        //добавили эту фигню, при нажатии на кнопку отрабатывает функция фильтрации, в которую добавили поле ввода
+        //добавили эту штуку, при нажатии на кнопку отрабатывает функция фильтрации, в которую добавили поле ввода
         $('#addMarkers').bind('click', for_button);
         function for_button() {
             objectManager.setFilter(getFilterFunction(ymaps.util.extend({}, listBoxControl.state.get('filters'))));
@@ -305,7 +305,7 @@ function init()
         }).done(function (data) {
             objectManager.add(data);
         });
-        		// хотел сначала через поиск, но подумал в пизду))
+        		// хотел сначала через поиск, но подумал зачем
         // Создаем экземпляр класса ymaps.control.SearchControl
 		// var mySearchControl = new ymaps.control.SearchControl({
 		// 	options: {

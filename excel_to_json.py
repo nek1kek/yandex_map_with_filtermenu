@@ -22,9 +22,10 @@ def parse_xlsx_to_2d_array(name_of_file):
     schools = []
     for i in range(count_of_school):
         temp = []
-        for _ in range(46):
+        for _ in range(47):
             temp.append(sheet[i + 2][_].value)
         schools.append(temp)
+    print(schools)
     return schools
 
 
@@ -67,7 +68,7 @@ def array_to_json(schools):
                "Химия", "Английский", "История", "Обществознание", "Экономика", "Русский язык", "Литература",
                "Центральный", "Северный", "Северо-Восточный", "Восточный", "Юго-Восточный", "Южный", "Юго-Западный",
                "Западный", "Северо-Западный", "Остальные", "Январь", "Февраль", "Март", "Апрель", "Май", "Июнь", "Июль",
-               "Август", "Лицей", "Гимназия", "Школа", "Частная школа"]
+               "Август", "Лицей", "Гимназия", "Школа", "Частная школа", "Ссылка"]
     features = []
     num_id = 0
     for school in schools:
@@ -106,6 +107,8 @@ def array_to_json(schools):
                 month.append(filters[_])
             elif 41 <= _ <= 44 and (school[_] == 1 or school[_] == '1'):
                 tip_school.append(filters[_])
+            elif _ == 45:
+                link = school[_]
 
         balloon_text = ["<strong> Поступление в классы: </strong>" + ', '.join(enter_class),
                         "<strong> Профильные предметы: </strong> " + ', '.join(predmet),
@@ -113,7 +116,9 @@ def array_to_json(schools):
                         "<strong> Месяц отбора: </strong>" + ', '.join(month),
                         "<strong> Статус школы: </strong>" + ', '.join(tip_school)]
 
-        properties['balloonContentBody'] = '<address>' + "<br/>".join(balloon_text) + '</address>'
+        info_about_school = '<address>' + "<br/>".join(balloon_text) + '</address>'
+        school_link = f'<a align=”right” target="_blank" rel="noopener noreferrer" href="{link}">Страница школы</a>'
+        properties['balloonContentBody'] = info_about_school + school_link
         json_school['properties'] = properties
         json_school['options'] = {'preset': 'islands#nightStretchyIcon'}
 
@@ -132,4 +137,5 @@ Tk().withdraw()  # we don't want a full GUI, so keep the root window from appear
 filename = askopenfilename()  # show an "Open" dialog box and return the path to the selected file
 schools = parse_xlsx_to_2d_array(filename)
 array_to_json(schools)
+print('lkdkfg;slkdjkfg;lskdmgd')
 onInfo()
