@@ -4,31 +4,6 @@ from tkinter import Tk  # from tkinter import Tk for Python 3.x
 from tkinter.filedialog import askopenfilename
 from tkinter import messagebox as mbox
 
-
-
-# строки с единицы, ряды с нуля
-def parse_xlsx_to_2d_array(name_of_file):
-    book = openpyxl.open(name_of_file, read_only=True)  # просто открытие файла
-    sheet = book.active  # открытие первой страницы
-
-    which_line_is_last = 2
-    while True:
-        if sheet[f"A{which_line_is_last}"].value is not None:
-            which_line_is_last += 1
-        else:
-            break
-
-    count_of_school = which_line_is_last - 2
-    schools = []
-    for i in range(count_of_school):
-        temp = []
-        for _ in range(47):
-            temp.append(sheet[i + 2][_].value)
-        schools.append(temp)
-    print(schools)
-    return schools
-
-
 # json structure of file:
 # {'type': 'FeatureCollection',
 # 'features': [
@@ -58,24 +33,48 @@ def parse_xlsx_to_2d_array(name_of_file):
 # 	    }
 # ]
 # }
+
+
+filters = ["iconContent", "в 1 класс", "в 2 класс", "в 3 класс", "в 4 класс", "в 5 класс", "в 6 класс", "в 7 класс",
+           "в 8 класс", "в 9 класс", "в 10 класс", "в 11 класс", "Математика", "Физика", "Информатика", "Биология",
+           "Химия", "Английский", "История", "Обществознание", "Экономика", "Русский язык", "Литература",
+           "Центральный", "Северный", "Северо-Восточный", "Восточный", "Юго-Восточный", "Южный", "Юго-Западный",
+           "Западный", "Северо-Западный", "Остальные", "Январь", "Февраль", "Март", "Апрель", "Май", "Июнь", "Июль",
+           "Август", "Лицей", "Гимназия", "Школа", "Частная школа", "Ссылка"]
+
 def foo(coordinate):
     return round(float(coordinate), 6)
 
-
-def array_to_json(schools):
-    filters = ["iconContent", "в 1 класс", "в 2 класс", "в 3 класс", "в 4 класс", "в 5 класс", "в 6 класс", "в 7 класс",
-               "в 8 класс", "в 9 класс", "в 10 класс", "в 11 класс", "Математика", "Физика", "Информатика", "Биология",
-               "Химия", "Английский", "История", "Обществознание", "Экономика", "Русский язык", "Литература",
-               "Центральный", "Северный", "Северо-Восточный", "Восточный", "Юго-Восточный", "Южный", "Юго-Западный",
-               "Западный", "Северо-Западный", "Остальные", "Январь", "Февраль", "Март", "Апрель", "Май", "Июнь", "Июль",
-               "Август", "Лицей", "Гимназия", "Школа", "Частная школа", "Ссылка"]
+# строки с единицы, ряды с нуля
+def parse_xlsx_to_2d_array(name_of_file):
     features = []
     num_id = 0
-    for school in schools:
-        # print(school)
-        json_school = {'type': 'Feature', 'id': num_id}
-        num_id += 1
+    book = openpyxl.open(name_of_file, read_only=True)  # просто открытие файла
+    sheet = book.active  # открытие первой страницы
 
+    which_line_is_last = 2
+    while True:
+        if sheet[f"A{which_line_is_last}"].value is not None:
+            which_line_is_last += 1
+        else:
+            break
+
+    count_of_school = which_line_is_last - 2
+    for i in range(count_of_school):
+        school = []
+        for _ in range(47):
+            school.append(sheet[i + 2][_].value)
+        features.append(array_to_json(school, num_id))
+        num_id += 1
+        print(f"Обработано: {num_id} из {count_of_school} школ")
+
+    json_dict = {'type': 'FeatureCollection', 'features': features}
+    with open('data.json', 'w') as outfile:
+        json.dump(json_dict, outfile)
+
+
+def array_to_json(school,num_id):
+        json_school = {'type': 'Feature', 'id': num_id}
         coordinates = list(map(foo, school[1].split(', ')))
         json_school['geometry'] = {'type': 'Point', 'coordinates': coordinates}
 
@@ -117,16 +116,14 @@ def array_to_json(schools):
                         "<strong> Статус школы: </strong>" + ', '.join(tip_school)]
 
         info_about_school = '<address>' + "<br/>".join(balloon_text) + '</address>'
-        school_link = f'<a align=”right” target="_blank" rel="noopener noreferrer" href="{link}">Страница школы</a>'
+        school_link = f'<a target="_blank" rel="noopener noreferrer" href="{link}"><strong>Страница школы</strong></a>'
         properties['balloonContentBody'] = info_about_school + school_link
         json_school['properties'] = properties
         json_school['options'] = {'preset': 'islands#nightStretchyIcon'}
 
-        features.append(json_school)
+        return json_school
 
-    json_dict = {'type': 'FeatureCollection', 'features': features}
-    with open('data.json', 'w') as outfile:
-        json.dump(json_dict, outfile)
+
 
 
 def onInfo():
@@ -135,7 +132,5 @@ def onInfo():
 
 Tk().withdraw()  # we don't want a full GUI, so keep the root window from appearing
 filename = askopenfilename()  # show an "Open" dialog box and return the path to the selected file
-schools = parse_xlsx_to_2d_array(filename)
-array_to_json(schools)
-print('lkdkfg;slkdjkfg;lskdmgd')
+parse_xlsx_to_2d_array(filename)
 onInfo()
